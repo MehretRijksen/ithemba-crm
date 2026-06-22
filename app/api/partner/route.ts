@@ -1,0 +1,41 @@
+import { createClient } from "@supabase/supabase-js";
+import { Resend } from "resend";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(req: NextRequest) {
+  const data = await req.json();
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
+
+  const { error } = await supabase.from("partners").insert([data]);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const resend = new Resend(process.env.RESEND_API_KEY!);
+  await resend.emails.send({
+    from: "Ithemba Kuluntu <onboarding@resend.dev>",
+    to: data.email,
+    subject: "Welkom als partner van Ithemba Kuluntu!",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
+        <div style="background: #166534; padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Ithemba Kuluntu</h1>
+        </div>
+        <div style="background: #f9fafb; padding: 32px; border-radius: 0 0 12px 12px;">
+          <h2 style="color: #166534;">Bedankt, ${data.voornaam}!</h2>
+          <p>Uw registratie als <strong>${data.type}</strong> van Ithemba Kuluntu is succesvol ontvangen.</p>
+          <p>Wij zijn blij dat <strong>${data.bedrijfsnaam}</strong> deel uitmaakt van onze missie om gemeenschappen in Zuid-Afrika te versterken.</p>
+          <p>Ons team neemt binnenkort contact met u op.</p>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+          <p style="color: #6b7280; font-size: 13px;">
+            Ithemba Kuluntu &bull; info@ithembakuluntu.org
+          </p>
+        </div>
+      </div>
+    `,
+  });
+
+  return NextResponse.json({ success: true });
+}
