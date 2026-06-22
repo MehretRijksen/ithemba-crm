@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const resend = new Resend(process.env.RESEND_API_KEY!);
+
+  // Bevestigingsmail naar partner
   await resend.emails.send({
     from: "Ithemba Kuluntu <onboarding@resend.dev>",
     to: data.email,
@@ -29,9 +31,36 @@ export async function POST(req: NextRequest) {
           <p>Wij zijn blij dat <strong>${data.bedrijfsnaam}</strong> deel uitmaakt van onze missie om gemeenschappen in Zuid-Afrika te versterken.</p>
           <p>Ons team neemt binnenkort contact met u op.</p>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-          <p style="color: #6b7280; font-size: 13px;">
-            Ithemba Kuluntu &bull; info@ithembakuluntu.org
-          </p>
+          <p style="color: #6b7280; font-size: 13px;">Ithemba Kuluntu &bull; info@ithembakuluntu.org</p>
+        </div>
+      </div>
+    `,
+  });
+
+  // Notificatie naar Mehret
+  await resend.emails.send({
+    from: "Ithemba Kuluntu CRM <onboarding@resend.dev>",
+    to: "mehretrijksen@gmail.com",
+    subject: `Nieuwe partner: ${data.bedrijfsnaam}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
+        <div style="background: #1e3a5f; padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 20px;">Nieuwe partner geregistreerd</h1>
+        </div>
+        <div style="background: #f9fafb; padding: 32px; border-radius: 0 0 12px 12px;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; color: #6b7280; width: 140px;">Naam</td><td style="padding: 8px 0; font-weight: bold;">${data.voornaam} ${data.achternaam}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Bedrijf</td><td style="padding: 8px 0;">${data.bedrijfsnaam}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Functie</td><td style="padding: 8px 0;">${data.functie || "—"}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Email</td><td style="padding: 8px 0;">${data.email}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Telefoon</td><td style="padding: 8px 0;">${data.telefoon || "—"}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Website</td><td style="padding: 8px 0;">${data.website || "—"}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Type</td><td style="padding: 8px 0;">${data.type}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6b7280;">Opmerkingen</td><td style="padding: 8px 0;">${data.opmerkingen || "—"}</td></tr>
+          </table>
+          <a href="https://ithemba-crm.vercel.app/dashboard" style="display: inline-block; margin-top: 24px; background: #166534; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+            Bekijk dashboard
+          </a>
         </div>
       </div>
     `,
