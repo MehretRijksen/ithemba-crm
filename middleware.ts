@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const BESCHERMDE_PADEN = ["/dashboard"];
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -23,13 +25,21 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  const isProtected = BESCHERMDE_PADEN.some((pad) =>
+    request.nextUrl.pathname.startsWith(pad)
+  );
+
+  if (!user && isProtected) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (user && request.nextUrl.pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/login"],
 };

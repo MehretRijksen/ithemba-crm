@@ -2,15 +2,52 @@ import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
 
+const VERPLICHTE_VELDEN = ["voornaam", "achternaam", "bedrijfsnaam", "email", "type"];
+
 export async function POST(req: NextRequest) {
   const data = await req.json();
+
+  // Valideer verplichte velden
+  for (const veld of VERPLICHTE_VELDEN) {
+    if (!data[veld] || String(data[veld]).trim() === "") {
+      return NextResponse.json({ error: `Veld '${veld}' is verplicht.` }, { status: 400 });
+    }
+  }
+
+  // Valideer email formaat
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(data.email)) {
+    return NextResponse.json({ error: "Ongeldig emailadres." }, { status: 400 });
+  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_KEY!
   );
 
-  const { error } = await supabase.from("partners").insert([data]);
+  // Check op dubbele inzending
+  const { data: bestaand } = await supabase
+    .from("partners")
+    .select("id")
+    .eq("email", data.email)
+    .single();
+
+  if (bestaand) {
+    return NextResponse.json({ error: "Dit emailadres is al geregistreerd." }, { status: 409 });
+  }
+
+  const { error } = await supabase.from("partners").insert([{
+    voornaam: data.voornaam.trim(),
+    achternaam: data.achternaam.trim(),
+    bedrijfsnaam: data.bedrijfsnaam.trim(),
+    functie: data.functie?.trim() || null,
+    email: data.email.trim().toLowerCase(),
+    telefoon: data.telefoon?.trim() || null,
+    website: data.website?.trim() || null,
+    type: data.type,
+    opmerkingen: data.opmerkingen?.trim() || null,
+  }]);
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const resend = new Resend(process.env.RESEND_API_KEY!);
