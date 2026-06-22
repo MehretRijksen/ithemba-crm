@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function PartnerFormulier() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -29,6 +30,7 @@ export default function PartnerFormulier() {
     <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4 py-12">
       <div className="max-w-xl w-full">
         <div className="mb-8 text-center">
+          <Image src="/logo.png" alt="Ithemba Kuluntu" width={100} height={100} className="mx-auto mb-4" />
           <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
           <p className="text-gray-400 mt-2">Partnerregistratie formulier</p>
         </div>

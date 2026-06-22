@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -28,6 +29,7 @@ export default function Login() {
     <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
       <div className="max-w-sm w-full">
         <div className="text-center mb-8">
+          <Image src="/logo.png" alt="Ithemba Kuluntu" width={100} height={100} className="mx-auto mb-4" />
           <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
           <p className="text-gray-400 mt-2">Log in om verder te gaan</p>
         </div>
