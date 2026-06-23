@@ -3,11 +3,52 @@ import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
 
 const VERPLICHTE_VELDEN = ["voornaam", "achternaam", "bedrijfsnaam", "email", "type"];
+const TOEGESTANE_ORIGINS = [
+  "https://ithemba-crm.vercel.app",
+  "http://localhost:3000",
+];
+
+function getIP(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "onbekend"
+  );
+}
 
 export async function POST(req: NextRequest) {
-  const data = await req.json();
+  // CSRF: controleer origin
+  const origin = req.headers.get("origin") || "";
+  if (!TOEGESTANE_ORIGINS.includes(origin)) {
+    return NextResponse.json({ error: "Niet toegestaan." }, { status: 403 });
+  }
+
+  const ip = getIP(req);
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
+
+  // Rate limiting: max 5 verzoeken per IP per uur
+  const eenUurGeleden = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from("form_submissions")
+    .select("*", { count: "exact", head: true })
+    .eq("ip", ip)
+    .gte("created_at", eenUurGeleden);
+
+  if ((count ?? 0) >= 5) {
+    return NextResponse.json(
+      { error: "Te veel verzoeken. Probeer het later opnieuw." },
+      { status: 429 }
+    );
+  }
+
+  // Log dit verzoek
+  await supabase.from("form_submissions").insert([{ ip }]);
 
   // Valideer verplichte velden
+  const data = await req.json();
   for (const veld of VERPLICHTE_VELDEN) {
     if (!data[veld] || String(data[veld]).trim() === "") {
       return NextResponse.json({ error: `Veld '${veld}' is verplicht.` }, { status: 400 });
@@ -20,16 +61,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ongeldig emailadres." }, { status: 400 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!
-  );
-
   // Check op dubbele inzending
   const { data: bestaand } = await supabase
     .from("partners")
     .select("id")
-    .eq("email", data.email)
+    .eq("email", data.email.trim().toLowerCase())
     .single();
 
   if (bestaand) {
