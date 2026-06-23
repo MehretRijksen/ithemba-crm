@@ -5,13 +5,16 @@ Een CRM systeem voor Ithemba Kuluntu, een NGO uit Zuid-Afrika. Mehret Rijksen is
 
 ## Wie gebruikt het?
 - **Mehret Rijksen** (consultant, Nederland) — mehretrijksen@gmail.com
-- **CEO van Ithemba Kuluntu** (Zuid-Afrika) — heeft ook toegang tot het dashboard
+- **CEO van Ithemba Kuluntu** (Zuid-Afrika) — info@ithembakuluntu.org
 - **Partners/donateurs** — vullen het registratieformulier in na closing
 
 ## Wat doet het systeem?
-1. **Dashboard** (`/dashboard`) — beveiligd met login, toont alle partners in een tabel met zoek/filteroptie
-2. **Partnerformulier** (`/partner/nieuw`) — publiek formulier dat partners invullen na closing
-3. **Automatische emails** — partner krijgt bevestigingsmail, Mehret krijgt notificatie
+1. **Dashboard** (`/dashboard`) — beveiligd met login, toont statistieken + tabel met zoek/filter/sorteer
+2. **Partner detail** (`/dashboard/partner/[id]`) — alle info van één partner
+3. **Partner bewerken** (`/dashboard/partner/[id]/bewerken`) — info aanpassen
+4. **Partner verwijderen** — knop op detail pagina met bevestiging
+5. **Partnerformulier** (`/partner/nieuw?token=ithemba2026partners`) — beveiligd met token
+6. **Automatische emails** — partner krijgt NL+EN bevestiging, Mehret én CEO krijgen notificatie
 
 ## Tech stack
 - **Framework:** Next.js 15 (App Router, TypeScript, Tailwind CSS)
@@ -42,26 +45,9 @@ git commit -m "omschrijving"
 git push
 ```
 
-## Wat nog gedaan moet worden (prioriteit)
-### Hoog
-- [ ] Email domein instellen (`info@ithembakuluntu.org`) zodra Mehret het Ithemba emailadres heeft (na woensdag)
-- [ ] SQL uitvoeren in Supabase voor `form_submissions` tabel (rate limiting)
-- [ ] Partner detail pagina — klik op een partner voor alle info
-- [ ] Partner bewerken en verwijderen
-- [ ] Statistieken bovenaan dashboard (aantal partners, donateurs, beide)
-- [ ] Favicon instellen
-
-### Middel
-- [ ] Email ook naar CEO sturen bij nieuwe partner
-- [ ] Export naar Excel/CSV
-- [ ] Sorteren op kolommen in tabel
-- [ ] Mobiel testen en verbeteren
-- [ ] Eigen domeinnaam (`crm.ithembakuluntu.org`)
-
-### Laag
-- [ ] Bevestigingsmail ook in het Engels
-- [ ] Error logging
-- [ ] Betere emailopmaak met logo
+## Partnerformulier link
+De link die je naar partners stuurt:
+`https://ithemba-crm.vercel.app/partner/nieuw?token=ithemba2026partners`
 
 ## Supabase database structuur
 ### Tabel: partners
@@ -79,15 +65,37 @@ git push
 | opmerkingen | text |
 | created_at | timestamp |
 
-### Tabel: form_submissions (voor rate limiting)
+### Tabel: form_submissions (rate limiting)
 | Kolom | Type |
 |-------|------|
 | id | uuid |
 | ip | text |
 | created_at | timestamp |
 
-## Belangrijk
-- `.env.local` staat NIET op GitHub (staat in .gitignore) — bevat alle geheime keys
+### Tabel: error_logs
+| Kolom | Type |
+|-------|------|
+| id | uuid |
+| bericht | text |
+| context | text |
+| created_at | timestamp |
+
+## Beveiliging
+- Row Level Security aan op alle tabellen
+- Service role policies ingesteld op alle tabellen
 - Rate limiting: max 5 formulier-inzendingen per IP per uur
 - CSRF bescherming: alleen verzoeken van `ithemba-crm.vercel.app` of `localhost:3000`
-- Row Level Security staat aan in Supabase
+- Formulier beveiligd met token: `ithemba2026partners`
+
+## Wat nog gedaan moet worden
+### Hoog
+- [ ] Email domein instellen (`info@ithembakuluntu.org`) — na woensdag
+- [ ] Eigen domeinnaam (`crm.ithembakuluntu.org`)
+
+### Middel
+- [ ] Export naar Excel/CSV
+- [ ] Design verbeteren
+- [ ] Email opmaak met logo
+
+### Laag
+- [ ] Database backup strategie documenteren
