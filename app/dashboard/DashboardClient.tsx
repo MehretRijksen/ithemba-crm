@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const typeBadge: Record<string, string> = {
   partner: "bg-blue-800 text-blue-200",
@@ -9,9 +10,14 @@ const typeBadge: Record<string, string> = {
   beide: "bg-purple-800 text-purple-200",
 };
 
-export default function DashboardClient({ partners }: { partners: Record<string, string>[] }) {
+type Partner = Record<string, string>;
+type SortKey = "naam" | "bedrijfsnaam" | "type" | "created_at";
+
+export default function DashboardClient({ partners, gebruiker }: { partners: Partner[]; gebruiker: string }) {
   const [zoekterm, setZoekterm] = useState("");
   const [filterType, setFilterType] = useState("alle");
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortAsc, setSortAsc] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -20,30 +26,55 @@ export default function DashboardClient({ partners }: { partners: Record<string,
     router.push("/login");
   }
 
-  const gefilterd = partners.filter((p) => {
-    const matchZoek =
-      zoekterm === "" ||
-      `${p.voornaam} ${p.achternaam} ${p.bedrijfsnaam} ${p.email}`
-        .toLowerCase()
-        .includes(zoekterm.toLowerCase());
-    const matchType = filterType === "alle" || p.type === filterType;
-    return matchZoek && matchType;
-  });
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortKey(key);
+      setSortAsc(true);
+    }
+  }
+
+  const gefilterd = partners
+    .filter((p) => {
+      const matchZoek =
+        zoekterm === "" ||
+        `${p.voornaam} ${p.achternaam} ${p.bedrijfsnaam} ${p.email}`
+          .toLowerCase()
+          .includes(zoekterm.toLowerCase());
+      const matchType = filterType === "alle" || p.type === filterType;
+      return matchZoek && matchType;
+    })
+    .sort((a, b) => {
+      let valA = sortKey === "naam" ? `${a.voornaam} ${a.achternaam}` : a[sortKey] ?? "";
+      let valB = sortKey === "naam" ? `${b.voornaam} ${b.achternaam}` : b[sortKey] ?? "";
+      return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    });
+
+  const stats = {
+    totaal: partners.length,
+    partner: partners.filter((p) => p.type === "partner").length,
+    donateur: partners.filter((p) => p.type === "donateur").length,
+    beide: partners.filter((p) => p.type === "beide").length,
+  };
+
+  const SortIcon = ({ k }: { k: SortKey }) =>
+    sortKey === k ? (sortAsc ? <span> ↑</span> : <span> ↓</span>) : <span className="opacity-30"> ↕</span>;
 
   return (
     <main className="min-h-screen bg-gray-950 text-white px-4 py-10">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
-            <p className="text-gray-400 mt-1">{partners.length} partners & donateurs geregistreerd</p>
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <p className="text-gray-400 mt-1">Welkom, {gebruiker}</p>
           </div>
           <div className="flex gap-3">
-            <a href="/partner/nieuw" className="bg-green-600 hover:bg-green-500 transition px-4 py-2 rounded-lg text-sm font-semibold">
+            <Link href="/partner/nieuw" className="bg-green-600 hover:bg-green-500 transition px-4 py-2 rounded-lg text-sm font-semibold">
               + Nieuwe partner
-            </a>
+            </Link>
             <button
               onClick={handleUitloggen}
               className="bg-gray-800 hover:bg-gray-700 transition px-4 py-2 rounded-lg text-sm font-semibold text-gray-300"
@@ -51,6 +82,21 @@ export default function DashboardClient({ partners }: { partners: Record<string,
               Uitloggen
             </button>
           </div>
+        </div>
+
+        {/* Statistieken */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Totaal", value: stats.totaal, kleur: "bg-gray-800" },
+            { label: "Partners", value: stats.partner, kleur: "bg-blue-900" },
+            { label: "Donateurs", value: stats.donateur, kleur: "bg-yellow-900" },
+            { label: "Beide", value: stats.beide, kleur: "bg-purple-900" },
+          ].map((s) => (
+            <div key={s.label} className={`${s.kleur} rounded-xl p-4 text-center`}>
+              <div className="text-3xl font-bold">{s.value}</div>
+              <div className="text-sm text-gray-400 mt-1">{s.label}</div>
+            </div>
+          ))}
         </div>
 
         {/* Zoeken & filteren */}
@@ -85,12 +131,21 @@ export default function DashboardClient({ partners }: { partners: Record<string,
             <table className="w-full text-sm">
               <thead className="bg-gray-900 text-gray-400">
                 <tr>
-                  <th className="text-left px-4 py-3">Naam</th>
-                  <th className="text-left px-4 py-3">Bedrijf</th>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("naam")}>
+                    Naam <SortIcon k="naam" />
+                  </th>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("bedrijfsnaam")}>
+                    Bedrijf <SortIcon k="bedrijfsnaam" />
+                  </th>
                   <th className="text-left px-4 py-3">Email</th>
                   <th className="text-left px-4 py-3">Telefoon</th>
-                  <th className="text-left px-4 py-3">Type</th>
-                  <th className="text-left px-4 py-3">Datum</th>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("type")}>
+                    Type <SortIcon k="type" />
+                  </th>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("created_at")}>
+                    Datum <SortIcon k="created_at" />
+                  </th>
+                  <th className="text-left px-4 py-3">Acties</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
@@ -106,6 +161,16 @@ export default function DashboardClient({ partners }: { partners: Record<string,
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-400">{new Date(p.created_at).toLocaleDateString("nl-NL")}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <Link href={`/dashboard/partner/${p.id}`} className="text-blue-400 hover:text-blue-300 text-xs">
+                          Bekijk
+                        </Link>
+                        <Link href={`/dashboard/partner/${p.id}/bewerken`} className="text-yellow-400 hover:text-yellow-300 text-xs">
+                          Bewerk
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
