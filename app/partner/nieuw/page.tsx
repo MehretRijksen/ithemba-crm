@@ -1,30 +1,120 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function PartnerFormulier() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+const VELD_FOUTEN: Record<string, string> = {
+  voornaam: "Vul uw voornaam in.",
+  achternaam: "Vul uw achternaam in.",
+  bedrijfsnaam: "Vul de bedrijfsnaam in.",
+  email: "Vul een geldig e-mailadres in.",
+  type: "Selecteer een type samenwerking.",
+};
+
+function Formulier() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "dubbel" | "geblokkeerd">("idle");
+  const [foutmelding, setFoutmelding] = useState("");
+  const [veldFouten, setVeldFouten] = useState<Record<string, string>>({});
+
+  const geheimeToken = process.env.NEXT_PUBLIC_FORM_TOKEN;
+  if (geheimeToken && token !== geheimeToken) {
+    return (
+      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <div className="text-5xl">🔒</div>
+          <h2 className="text-xl font-bold">Deze pagina is niet toegankelijk.</h2>
+          <p className="text-gray-400">Neem contact op met Ithemba Kuluntu voor een registratielink.</p>
+        </div>
+      </main>
+    );
+  }
+
+  function valideer(data: Record<string, string>): boolean {
+    const fouten: Record<string, string> = {};
+    for (const [veld, bericht] of Object.entries(VELD_FOUTEN)) {
+      if (!data[veld] || data[veld].trim() === "") {
+        fouten[veld] = bericht;
+      }
+    }
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      fouten.email = "Dit e-mailadres is niet geldig.";
+    }
+    setVeldFouten(fouten);
+    return Object.keys(fouten).length === 0;
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("loading");
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
-    const res = await fetch("/api/partner", { method: "POST", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
-    setStatus(res.ok ? "success" : "error");
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+
+    if (!valideer(data)) return;
+
+    setStatus("loading");
+    setFoutmelding("");
+
+    const res = await fetch("/api/partner", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (res.ok) {
+      setStatus("success");
+    } else if (res.status === 409) {
+      setStatus("dubbel");
+    } else if (res.status === 429) {
+      setStatus("geblokkeerd");
+    } else {
+      const json = await res.json().catch(() => ({}));
+      setFoutmelding(json.error || "Er is iets misgegaan. Probeer het later opnieuw.");
+      setStatus("error");
+    }
   }
 
   if (status === "success") {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-md">
           <div className="text-5xl">✅</div>
           <h2 className="text-2xl font-bold">Bedankt voor uw registratie!</h2>
-          <p className="text-gray-400">U ontvangt binnen enkele minuten een bevestigingsmail.</p>
+          <p className="text-gray-400">U ontvangt binnen enkele minuten een bevestigingsmail. Ons team neemt binnenkort contact met u op.</p>
         </div>
       </main>
     );
   }
+
+  if (status === "dubbel") {
+    return (
+      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="text-5xl">📧</div>
+          <h2 className="text-2xl font-bold">Al geregistreerd</h2>
+          <p className="text-gray-400">Dit e-mailadres is al geregistreerd bij Ithemba Kuluntu. Neem contact op als dit een fout is.</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (status === "geblokkeerd") {
+    return (
+      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="text-5xl">⏳</div>
+          <h2 className="text-2xl font-bold">Even wachten</h2>
+          <p className="text-gray-400">U heeft te veel pogingen gedaan. Probeer het over een uur opnieuw.</p>
+        </div>
+      </main>
+    );
+  }
+
+  const inputKlasse = (veld: string) =>
+    `w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 ${
+      veldFouten[veld] ? "ring-2 ring-red-500" : "focus:ring-green-500"
+    }`;
 
   return (
     <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4 py-12">
@@ -32,58 +122,60 @@ export default function PartnerFormulier() {
         <div className="mb-8 text-center">
           <Image src="/logo.png" alt="Ithemba Kuluntu" width={100} height={100} className="mx-auto mb-4" />
           <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
-          <p className="text-gray-400 mt-2">Partnerregistratie formulier</p>
+          <p className="text-gray-400 mt-2">Partnerregistratie / Partner Registration</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 bg-gray-900 rounded-2xl p-8">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5 bg-gray-900 rounded-2xl p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Voornaam *</label>
-              <input name="voornaam" required className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Achternaam *</label>
-              <input name="achternaam" required className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
+            {["voornaam", "achternaam"].map((veld) => (
+              <div key={veld}>
+                <label className="block text-sm text-gray-400 mb-1 capitalize">{veld} *</label>
+                <input name={veld} className={inputKlasse(veld)} />
+                {veldFouten[veld] && <p className="text-red-400 text-xs mt-1">{veldFouten[veld]}</p>}
+              </div>
+            ))}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Bedrijfsnaam *</label>
-            <input name="bedrijfsnaam" required className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <label className="block text-sm text-gray-400 mb-1">Bedrijfsnaam / Company *</label>
+            <input name="bedrijfsnaam" className={inputKlasse("bedrijfsnaam")} />
+            {veldFouten.bedrijfsnaam && <p className="text-red-400 text-xs mt-1">{veldFouten.bedrijfsnaam}</p>}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Functietitel</label>
-            <input name="functie" className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <label className="block text-sm text-gray-400 mb-1">Functietitel / Job Title</label>
+            <input name="functie" className={inputKlasse("functie")} />
           </div>
 
           <div>
             <label className="block text-sm text-gray-400 mb-1">E-mailadres *</label>
-            <input name="email" type="email" required className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <input name="email" type="email" className={inputKlasse("email")} />
+            {veldFouten.email && <p className="text-red-400 text-xs mt-1">{veldFouten.email}</p>}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Telefoonnummer</label>
-            <input name="telefoon" type="tel" className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <label className="block text-sm text-gray-400 mb-1">Telefoonnummer / Phone</label>
+            <input name="telefoon" type="tel" className={inputKlasse("telefoon")} />
           </div>
 
           <div>
             <label className="block text-sm text-gray-400 mb-1">Website</label>
-            <input name="website" type="url" placeholder="https://" className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <input name="website" type="url" placeholder="https://" className={inputKlasse("website")} />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Type samenwerking *</label>
-            <select name="type" required className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-              <option value="">Selecteer...</option>
+            <label className="block text-sm text-gray-400 mb-1">Type samenwerking / Partnership Type *</label>
+            <select name="type" className={inputKlasse("type")}>
+              <option value="">Selecteer... / Select...</option>
               <option value="partner">Partner</option>
-              <option value="donateur">Donateur</option>
-              <option value="beide">Partner & Donateur</option>
+              <option value="donateur">Donateur / Donor</option>
+              <option value="beide">Partner & Donateur / Partner & Donor</option>
             </select>
+            {veldFouten.type && <p className="text-red-400 text-xs mt-1">{veldFouten.type}</p>}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Opmerkingen</label>
+            <label className="block text-sm text-gray-400 mb-1">Opmerkingen / Notes</label>
             <textarea name="opmerkingen" rows={3} className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
           </div>
 
@@ -92,12 +184,22 @@ export default function PartnerFormulier() {
             disabled={status === "loading"}
             className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 transition rounded-xl py-3 font-semibold text-white"
           >
-            {status === "loading" ? "Bezig met verzenden..." : "Registratie indienen"}
+            {status === "loading" ? "Bezig met verzenden..." : "Registratie indienen / Submit Registration"}
           </button>
 
-          {status === "error" && <p className="text-red-400 text-sm text-center">Er is iets misgegaan. Probeer het opnieuw.</p>}
+          {status === "error" && (
+            <p className="text-red-400 text-sm text-center">{foutmelding}</p>
+          )}
         </form>
       </div>
     </main>
+  );
+}
+
+export default function PartnerFormulier() {
+  return (
+    <Suspense>
+      <Formulier />
+    </Suspense>
   );
 }
