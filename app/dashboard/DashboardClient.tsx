@@ -128,7 +128,7 @@ export default function DashboardClient({ partners, gebruiker }: { partners: Par
               <span>↓</span> Exporteer CSV
             </button>
             <Link
-              href="/partner/nieuw"
+              href={`/partner/nieuw?token=${process.env.NEXT_PUBLIC_FORM_TOKEN}`}
               className="bg-green-600 hover:bg-green-500 transition px-4 py-2 rounded-lg text-sm font-semibold"
             >
               + Nieuwe partner
