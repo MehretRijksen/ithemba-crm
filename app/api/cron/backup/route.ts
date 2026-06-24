@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   await resend.emails.send({
-    from: "onboarding@resend.dev",
+    from: "Ithemba Kuluntu CRM <onboarding@resend.dev>",
     to: "mehretrijksen@gmail.com",
     subject: `Ithemba CRM — Wekelijkse backup (${datum})`,
     html: `
