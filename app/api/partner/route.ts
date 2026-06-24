@@ -16,26 +16,55 @@ function getIP(req: NextRequest): string {
   );
 }
 
+const LOGO_URL = "https://ithemba-crm.vercel.app/logo.png";
+
+const emailHeader = () => `
+  <div style="background: linear-gradient(135deg, #14532d 0%, #166534 100%); padding: 32px 24px; text-align: center; border-radius: 12px 12px 0 0;">
+    <img src="${LOGO_URL}" alt="Ithemba Kuluntu" width="72" height="72" style="border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;" />
+    <h1 style="color: white; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">Ithemba Kuluntu</h1>
+    <p style="color: rgba(255,255,255,0.7); margin: 4px 0 0; font-size: 13px;">Partner & Donor CRM</p>
+  </div>
+`;
+
+const emailFooter = () => `
+  <div style="background: #f1f5f9; padding: 20px 32px; border-top: 1px solid #e2e8f0; text-align: center; border-radius: 0 0 12px 12px;">
+    <p style="color: #94a3b8; font-size: 12px; margin: 0;">Ithemba Kuluntu &bull; <a href="mailto:info@ithembakuluntu.org" style="color: #64748b;">info@ithembakuluntu.org</a></p>
+    <p style="color: #cbd5e1; font-size: 11px; margin: 6px 0 0;">Empowering communities in South Africa</p>
+  </div>
+`;
+
+const rij = (label: string, waarde: string) => `
+  <tr>
+    <td style="padding: 10px 0; color: #64748b; font-size: 13px; width: 140px; vertical-align: top;">${label}</td>
+    <td style="padding: 10px 0; color: #1e293b; font-size: 14px; font-weight: 500;">${waarde || "—"}</td>
+  </tr>
+  <tr><td colspan="2" style="border-bottom: 1px solid #f1f5f9; padding: 0;"></td></tr>
+`;
+
 const notificatieHTML = (data: Record<string, string>) => `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-    <div style="background: #1e3a5f; padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 20px;">New partner registered / Nieuwe partner geregistreerd</h1>
-    </div>
-    <div style="background: #f9fafb; padding: 32px; border-radius: 0 0 12px 12px;">
+  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+    ${emailHeader()}
+    <div style="padding: 32px;">
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px;">
+        <p style="margin: 0; color: #166534; font-size: 14px; font-weight: 600;">Nieuwe partner geregistreerd / New partner registered</p>
+      </div>
       <table style="width: 100%; border-collapse: collapse;">
-        <tr><td style="padding: 8px 0; color: #6b7280; width: 140px;">Name / Naam</td><td style="padding: 8px 0; font-weight: bold;">${data.voornaam} ${data.achternaam}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Company / Bedrijf</td><td style="padding: 8px 0;">${data.bedrijfsnaam}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Function / Functie</td><td style="padding: 8px 0;">${data.functie || "—"}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Email</td><td style="padding: 8px 0;">${data.email}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Phone / Telefoon</td><td style="padding: 8px 0;">${data.telefoon || "—"}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Website</td><td style="padding: 8px 0;">${data.website || "—"}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Type</td><td style="padding: 8px 0;">${data.type}</td></tr>
-        <tr><td style="padding: 8px 0; color: #6b7280;">Notes / Opmerkingen</td><td style="padding: 8px 0;">${data.opmerkingen || "—"}</td></tr>
+        ${rij("Naam / Name", `${data.voornaam} ${data.achternaam}`)}
+        ${rij("Bedrijf / Company", data.bedrijfsnaam)}
+        ${rij("Functie / Role", data.functie)}
+        ${rij("Email", data.email)}
+        ${rij("Telefoon / Phone", data.telefoon)}
+        ${rij("Website", data.website)}
+        ${rij("Type", data.type)}
+        ${rij("Opmerkingen / Notes", data.opmerkingen)}
       </table>
-      <a href="https://ithemba-crm.vercel.app/dashboard" style="display: inline-block; margin-top: 24px; background: #166534; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-        View dashboard
-      </a>
+      <div style="text-align: center; margin-top: 28px;">
+        <a href="https://ithemba-crm.vercel.app/dashboard" style="display: inline-block; background: linear-gradient(135deg, #14532d, #166534); color: white; padding: 13px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          Bekijk dashboard &rarr;
+        </a>
+      </div>
     </div>
+    ${emailFooter()}
   </div>
 `;
 
@@ -120,18 +149,32 @@ export async function POST(req: NextRequest) {
     to: data.email,
     subject: "Welcome to Ithemba Kuluntu / Welkom als partner!",
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-        <div style="background: #166534; padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Ithemba Kuluntu</h1>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+        ${emailHeader()}
+        <div style="padding: 36px 32px;">
+          <h2 style="color: #14532d; font-size: 20px; margin: 0 0 8px;">Welcome, ${data.voornaam}! 🎉</h2>
+          <p style="color: #475569; font-size: 14px; margin: 0 0 24px;">Welkom bij Ithemba Kuluntu</p>
+
+          <div style="background: #f8fafc; border-left: 4px solid #166534; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 24px;">
+            <p style="margin: 0; color: #1e293b; font-size: 14px; line-height: 1.6;">
+              <strong>English:</strong> Your registration as a <strong>${data.type}</strong> of Ithemba Kuluntu has been received. We are thrilled to have <strong>${data.bedrijfsnaam}</strong> as part of our mission to strengthen and empower communities in South Africa. Our team will be in touch with you shortly.
+            </p>
+          </div>
+
+          <div style="background: #f8fafc; border-left: 4px solid #166534; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 32px;">
+            <p style="margin: 0; color: #1e293b; font-size: 14px; line-height: 1.6;">
+              <strong>Nederlands:</strong> Uw registratie als <strong>${data.type}</strong> van Ithemba Kuluntu is succesvol ontvangen. Wij zijn verheugd dat <strong>${data.bedrijfsnaam}</strong> deel uitmaakt van onze missie om gemeenschappen in Zuid-Afrika te versterken. Ons team neemt binnenkort contact met u op.
+            </p>
+          </div>
+
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px 18px;">
+            <p style="margin: 0; color: #166534; font-size: 13px;">
+              Vragen? / Questions? &nbsp;&bull;&nbsp;
+              <a href="mailto:info@ithembakuluntu.org" style="color: #166534; font-weight: 600;">info@ithembakuluntu.org</a>
+            </p>
+          </div>
         </div>
-        <div style="background: #f9fafb; padding: 32px; border-radius: 0 0 12px 12px;">
-          <h2 style="color: #166534;">Thank you, ${data.voornaam}! / Bedankt, ${data.voornaam}!</h2>
-          <p><strong>English:</strong> Your registration as a <strong>${data.type}</strong> of Ithemba Kuluntu has been successfully received. We are happy that <strong>${data.bedrijfsnaam}</strong> is part of our mission to strengthen communities in South Africa. Our team will contact you shortly.</p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
-          <p><strong>Nederlands:</strong> Uw registratie als <strong>${data.type}</strong> van Ithemba Kuluntu is succesvol ontvangen. Wij zijn blij dat <strong>${data.bedrijfsnaam}</strong> deel uitmaakt van onze missie. Ons team neemt binnenkort contact met u op.</p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-          <p style="color: #6b7280; font-size: 13px;">Ithemba Kuluntu &bull; info@ithembakuluntu.org</p>
-        </div>
+        ${emailFooter()}
       </div>
     `,
   });
