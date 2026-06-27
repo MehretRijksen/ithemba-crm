@@ -13,11 +13,8 @@ export default function ResetWachtwoord() {
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        // Supabase heeft de sessie hersteld via de resetlink
-      }
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
+    return () => subscription.unsubscribe();
   }, [supabase]);
 
   async function handleReset(e: React.FormEvent) {

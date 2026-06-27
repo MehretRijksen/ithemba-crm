@@ -5,12 +5,21 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 const VELD_FOUTEN: Record<string, string> = {
-  voornaam: "Vul uw voornaam in.",
-  achternaam: "Vul uw achternaam in.",
-  bedrijfsnaam: "Vul de bedrijfsnaam in.",
-  email: "Vul een geldig e-mailadres in.",
-  type: "Selecteer een type samenwerking.",
+  voornaam: "Vul uw voornaam in. / Please fill in your first name.",
+  achternaam: "Vul uw achternaam in. / Please fill in your last name.",
+  bedrijfsnaam: "Vul de bedrijfsnaam in. / Please fill in your company name.",
+  email: "Vul een geldig e-mailadres in. / Please enter a valid email address.",
+  type: "Selecteer een type samenwerking. / Please select a partnership type.",
 };
+
+function Logo() {
+  return (
+    <div className="mb-8 text-center">
+      <Image src="/logo.png" alt="Ithemba Kuluntu" width={100} height={100} className="mx-auto mb-4" />
+      <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
+    </div>
+  );
+}
 
 function Formulier() {
   const searchParams = useSearchParams();
@@ -23,10 +32,14 @@ function Formulier() {
   if (geheimeToken && token !== geheimeToken) {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4">
-          <div className="text-5xl">🔒</div>
-          <h2 className="text-xl font-bold">Deze pagina is niet toegankelijk.</h2>
-          <p className="text-gray-400">Neem contact op met Ithemba Kuluntu voor een registratielink.</p>
+        <div className="text-center space-y-4 max-w-sm">
+          <Logo />
+          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+            <div className="text-5xl">🔒</div>
+            <h2 className="text-xl font-bold">Niet toegankelijk / Access denied</h2>
+            <p className="text-gray-400 text-sm">Neem contact op met Ithemba Kuluntu voor een registratielink.<br/>Please contact Ithemba Kuluntu for a registration link.</p>
+            <p className="text-gray-500 text-xs pt-2">info@ithembakuluntu.org</p>
+          </div>
         </div>
       </main>
     );
@@ -40,7 +53,7 @@ function Formulier() {
       }
     }
     if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      fouten.email = "Dit e-mailadres is niet geldig.";
+      fouten.email = "Dit e-mailadres is niet geldig. / This email address is not valid.";
     }
     setVeldFouten(fouten);
     return Object.keys(fouten).length === 0;
@@ -78,10 +91,13 @@ function Formulier() {
   if (status === "success") {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="text-5xl">✅</div>
-          <h2 className="text-2xl font-bold">Bedankt voor uw registratie!</h2>
-          <p className="text-gray-400">U ontvangt binnen enkele minuten een bevestigingsmail. Ons team neemt binnenkort contact met u op.</p>
+        <div className="text-center space-y-4 max-w-sm">
+          <Logo />
+          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+            <div className="text-5xl">✅</div>
+            <h2 className="text-2xl font-bold">Bedankt! / Thank you!</h2>
+            <p className="text-gray-400 text-sm">Uw registratie is ontvangen. U ontvangt binnen enkele minuten een bevestigingsmail.<br/><br/>Your registration has been received. You will receive a confirmation email shortly.</p>
+          </div>
         </div>
       </main>
     );
@@ -90,10 +106,14 @@ function Formulier() {
   if (status === "dubbel") {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="text-5xl">📧</div>
-          <h2 className="text-2xl font-bold">Al geregistreerd</h2>
-          <p className="text-gray-400">Dit e-mailadres is al geregistreerd bij Ithemba Kuluntu. Neem contact op als dit een fout is.</p>
+        <div className="text-center space-y-4 max-w-sm">
+          <Logo />
+          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+            <div className="text-5xl">📧</div>
+            <h2 className="text-2xl font-bold">Al geregistreerd / Already registered</h2>
+            <p className="text-gray-400 text-sm">Dit e-mailadres is al geregistreerd. Neem contact op als dit een fout is.<br/><br/>This email address is already registered. Please contact us if this is an error.</p>
+            <p className="text-gray-500 text-xs pt-2">info@ithembakuluntu.org</p>
+          </div>
         </div>
       </main>
     );
@@ -102,10 +122,13 @@ function Formulier() {
   if (status === "geblokkeerd") {
     return (
       <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="text-5xl">⏳</div>
-          <h2 className="text-2xl font-bold">Even wachten</h2>
-          <p className="text-gray-400">U heeft te veel pogingen gedaan. Probeer het over een uur opnieuw.</p>
+        <div className="text-center space-y-4 max-w-sm">
+          <Logo />
+          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+            <div className="text-5xl">⏳</div>
+            <h2 className="text-2xl font-bold">Even wachten / Please wait</h2>
+            <p className="text-gray-400 text-sm">U heeft te veel pogingen gedaan. Probeer het over een uur opnieuw.<br/><br/>Too many attempts. Please try again in an hour.</p>
+          </div>
         </div>
       </main>
     );
@@ -127,13 +150,16 @@ function Formulier() {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-5 bg-gray-900 rounded-2xl p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {["voornaam", "achternaam"].map((veld) => (
-              <div key={veld}>
-                <label className="block text-sm text-gray-400 mb-1 capitalize">{veld} *</label>
-                <input name={veld} className={inputKlasse(veld)} />
-                {veldFouten[veld] && <p className="text-red-400 text-xs mt-1">{veldFouten[veld]}</p>}
-              </div>
-            ))}
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Voornaam / First name *</label>
+              <input name="voornaam" className={inputKlasse("voornaam")} />
+              {veldFouten.voornaam && <p className="text-red-400 text-xs mt-1">{veldFouten.voornaam}</p>}
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Achternaam / Last name *</label>
+              <input name="achternaam" className={inputKlasse("achternaam")} />
+              {veldFouten.achternaam && <p className="text-red-400 text-xs mt-1">{veldFouten.achternaam}</p>}
+            </div>
           </div>
 
           <div>
@@ -148,7 +174,7 @@ function Formulier() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">E-mailadres *</label>
+            <label className="block text-sm text-gray-400 mb-1">E-mailadres / Email *</label>
             <input name="email" type="email" className={inputKlasse("email")} />
             {veldFouten.email && <p className="text-red-400 text-xs mt-1">{veldFouten.email}</p>}
           </div>
@@ -184,7 +210,7 @@ function Formulier() {
             disabled={status === "loading"}
             className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 transition rounded-xl py-3 font-semibold text-white"
           >
-            {status === "loading" ? "Bezig met verzenden..." : "Registratie indienen / Submit Registration"}
+            {status === "loading" ? "Bezig... / Sending..." : "Registratie indienen / Submit Registration"}
           </button>
 
           {status === "error" && (
