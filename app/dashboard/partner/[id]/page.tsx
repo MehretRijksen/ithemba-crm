@@ -14,9 +14,14 @@ async function getPartner(id: string) {
 }
 
 const typeBadge: Record<string, string> = {
-  partner: "bg-blue-900/60 text-blue-300 border border-blue-700",
-  donateur: "bg-amber-900/60 text-amber-300 border border-amber-700",
-  beide: "bg-purple-900/60 text-purple-300 border border-purple-700",
+  partner: "bg-blue-100 text-blue-700",
+  donateur: "bg-amber-100 text-amber-700",
+  beide: "bg-purple-100 text-purple-700",
+};
+
+const statusBadge: Record<string, string> = {
+  prospect: "bg-slate-100 text-slate-600",
+  partner: "bg-green-100 text-green-700",
 };
 
 export default async function PartnerDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -36,61 +41,90 @@ export default async function PartnerDetail({ params }: { params: Promise<{ id: 
     { label: "Geregistreerd op", waarde: new Date(partner.created_at).toLocaleDateString("nl-NL") },
   ];
 
+  const contractVelden = partner.status === "partner" ? [
+    { label: "Bijdrage", waarde: partner.bedrag ? `€${parseFloat(partner.bedrag).toLocaleString("nl-NL")} ${partner.frequentie}` : null },
+    { label: "Looptijd", waarde: partner.looptijd },
+    { label: "Betalingswijze", waarde: partner.betalingswijze },
+    { label: "Contract ondertekend", waarde: partner.contract_ondertekend ? `Ja — ${new Date(partner.contract_ondertekend_op).toLocaleDateString("nl-NL")} door ${partner.contract_naam}` : "Nee" },
+  ] : [];
+
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      {/* Topbalk */}
-      <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-10">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image src="/logo.png" alt="Ithemba Kuluntu" width={36} height={36} className="rounded-full" />
             <div>
-              <div className="font-bold text-sm leading-tight">Ithemba Kuluntu</div>
-              <div className="text-xs text-gray-400 leading-tight">Partner CRM</div>
+              <div className="font-bold text-sm leading-tight text-slate-900">Ithemba Kuluntu</div>
+              <div className="text-xs text-slate-500 leading-tight">Partner CRM</div>
             </div>
           </div>
-          <Link href="/dashboard" className="text-gray-400 hover:text-white text-sm">
+          <Link href="/dashboard" className="text-slate-500 hover:text-slate-700 text-sm">
             ← Dashboard
           </Link>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Acties */}
         <div className="flex justify-end gap-3 mb-6">
           <Link
             href={`/dashboard/partner/${id}/bewerken`}
-            className="bg-amber-600 hover:bg-amber-500 transition px-4 py-2 rounded-lg text-sm font-semibold"
+            className="border border-slate-200 bg-white hover:bg-slate-50 transition px-4 py-2 rounded-xl text-sm font-medium text-slate-700"
           >
             Bewerken
           </Link>
           <VerwijderKnop id={id} naam={`${partner.voornaam} ${partner.achternaam}`} />
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
-          {/* Profielkop */}
-          <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-800">
-            <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-full w-16 h-16 flex items-center justify-center text-xl font-bold shrink-0">
-              {partner.voornaam[0]}{partner.achternaam[0]}
+        {/* Profielkop */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-4">
+          <div className="bg-blue-700 h-16" />
+          <div className="px-8 pb-8">
+            <div className="-mt-8 mb-4 flex items-end justify-between">
+              <div className="bg-white rounded-2xl w-16 h-16 flex items-center justify-center text-xl font-bold text-blue-700 border-2 border-white shadow-sm ring-1 ring-slate-200">
+                {partner.voornaam?.[0]}{partner.achternaam?.[0]}
+              </div>
+              <div className="flex gap-2 mt-2">
+                <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${typeBadge[partner.type] ?? "bg-slate-100 text-slate-600"}`}>
+                  {partner.type}
+                </span>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge[partner.status] ?? "bg-slate-100 text-slate-600"}`}>
+                  {partner.status === "partner" ? "gesloten" : partner.status ?? "prospect"}
+                </span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">{partner.voornaam} {partner.achternaam}</h1>
-              <p className="text-gray-400 text-sm mt-0.5">{partner.bedrijfsnaam}</p>
-              <span className={`inline-block mt-2 px-2.5 py-1 rounded-full text-xs font-medium ${typeBadge[partner.type] ?? "bg-gray-700 text-gray-300"}`}>
-                {partner.type}
-              </span>
-            </div>
+            <h1 className="text-2xl font-bold text-slate-900">{partner.voornaam} {partner.achternaam}</h1>
+            <p className="text-slate-500 text-sm mt-0.5">{partner.bedrijfsnaam}</p>
           </div>
+        </div>
 
-          {/* Velden */}
+        {/* Gegevens */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-4">
+          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-5">Contactgegevens</h2>
           <div className="space-y-4">
             {velden.map(({ label, waarde }) => waarde ? (
-              <div key={label} className="flex gap-4 pb-4 border-b border-gray-800/60 last:border-0 last:pb-0">
-                <span className="text-gray-400 text-sm w-36 shrink-0 pt-0.5">{label}</span>
-                <span className="text-white text-sm break-all">{waarde}</span>
+              <div key={label} className="flex gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0">
+                <span className="text-slate-400 text-sm w-36 shrink-0 pt-0.5">{label}</span>
+                <span className="text-slate-800 text-sm break-all">{waarde}</span>
               </div>
             ) : null)}
           </div>
         </div>
+
+        {/* Contractgegevens */}
+        {contractVelden.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-5">Contractgegevens</h2>
+            <div className="space-y-4">
+              {contractVelden.map(({ label, waarde }) => waarde ? (
+                <div key={label} className="flex gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0">
+                  <span className="text-slate-400 text-sm w-36 shrink-0 pt-0.5">{label}</span>
+                  <span className="text-slate-800 text-sm break-all">{waarde}</span>
+                </div>
+              ) : null)}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

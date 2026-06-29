@@ -37,34 +37,34 @@ export default function ContractOndertekenen({ token, naam, bedrijf }: { token: 
 
   if (status === "success") {
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-10 bg-green-50 rounded-2xl border border-green-200">
         <div className="text-5xl mb-4">✅</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Contract ondertekend!</h3>
-        <p className="text-gray-500 text-sm">U ontvangt een bevestiging per email. Welkom als partner van iThemba Kuluntu!</p>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">Contract ondertekend!</h3>
+        <p className="text-slate-500 text-sm">U ontvangt een bevestiging per email. Welkom als partner van iThemba Kuluntu!</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h3 className="font-bold text-gray-800 mb-4">Ondertekening</h3>
-      <p className="text-gray-600 text-sm mb-2">
+    <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+      <h3 className="font-bold text-slate-800 mb-3">Digitale ondertekening</h3>
+      <p className="text-slate-600 text-sm mb-2">
         Namens <strong>{bedrijf}</strong> verklaar ik akkoord te gaan met bovenstaande overeenkomst.
       </p>
-      <p className="text-gray-500 text-sm mb-6">
-        Typ uw volledige naam ter bevestiging: <strong className="text-gray-800">{naam}</strong>
+      <p className="text-slate-500 text-sm mb-6">
+        Typ uw volledige naam ter bevestiging: <strong className="text-slate-800">{naam}</strong>
       </p>
 
       <form onSubmit={handleOndertekenen} className="space-y-4">
         <div>
-          <label className="block text-sm text-gray-600 mb-1">Handtekening (volledige naam) *</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Handtekening (volledige naam) *</label>
           <input
             required
             type="text"
             value={handtekening}
             onChange={(e) => setHandtekening(e.target.value)}
             placeholder={naam}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
             style={{ fontFamily: "Georgia, serif" }}
           />
         </div>
@@ -74,9 +74,9 @@ export default function ContractOndertekenen({ token, naam, bedrijf }: { token: 
             type="checkbox"
             checked={akkoord}
             onChange={(e) => setAkkoord(e.target.checked)}
-            className="mt-1"
+            className="mt-1 accent-blue-700"
           />
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-slate-600">
             Ik ga akkoord met de bovenstaande partnerovereenkomst en bevestig dat ik bevoegd ben namens <strong>{bedrijf}</strong> te ondertekenen.
           </span>
         </label>
@@ -86,7 +86,7 @@ export default function ContractOndertekenen({ token, naam, bedrijf }: { token: 
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition text-base"
+          className="w-full bg-blue-700 hover:bg-blue-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition text-base"
         >
           {status === "loading" ? "Bezig met ondertekenen..." : "✍️ Contract ondertekenen"}
         </button>

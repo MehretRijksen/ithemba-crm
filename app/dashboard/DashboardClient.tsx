@@ -6,17 +6,22 @@ import Link from "next/link";
 import Image from "next/image";
 
 const typeBadge: Record<string, string> = {
-  partner: "bg-blue-900/60 text-blue-300 border border-blue-700",
-  donateur: "bg-amber-900/60 text-amber-300 border border-amber-700",
-  beide: "bg-purple-900/60 text-purple-300 border border-purple-700",
+  partner: "bg-blue-100 text-blue-700",
+  donateur: "bg-amber-100 text-amber-700",
+  beide: "bg-purple-100 text-purple-700",
+};
+
+const statusBadge: Record<string, string> = {
+  prospect: "bg-slate-100 text-slate-600",
+  partner: "bg-green-100 text-green-700",
 };
 
 type Partner = Record<string, string>;
 type SortKey = "naam" | "bedrijfsnaam" | "type" | "created_at";
 
 function exporteerCSV(partners: Partner[]) {
-  const kolommen = ["Voornaam", "Achternaam", "Bedrijfsnaam", "Functie", "Email", "Telefoon", "Website", "Type", "Opmerkingen", "Datum"];
-  const velden = ["voornaam", "achternaam", "bedrijfsnaam", "functie", "email", "telefoon", "website", "type", "opmerkingen", "created_at"];
+  const kolommen = ["Voornaam", "Achternaam", "Bedrijfsnaam", "Functie", "Email", "Telefoon", "Website", "Type", "Status", "Opmerkingen", "Datum"];
+  const velden = ["voornaam", "achternaam", "bedrijfsnaam", "functie", "email", "telefoon", "website", "type", "status", "opmerkingen", "created_at"];
 
   const csvRijen = [
     kolommen.join(";"),
@@ -88,23 +93,23 @@ export default function DashboardClient({ partners, gebruiker }: { partners: Par
     sortKey === k ? (sortAsc ? <span> ↑</span> : <span> ↓</span>) : <span className="opacity-30"> ↕</span>;
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
 
       {/* Topbalk */}
-      <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-10">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image src="/logo.png" alt="Ithemba Kuluntu" width={36} height={36} className="rounded-full" />
             <div>
-              <div className="font-bold text-sm leading-tight">Ithemba Kuluntu</div>
-              <div className="text-xs text-gray-400 leading-tight">Partner CRM</div>
+              <div className="font-bold text-sm leading-tight text-slate-900">Ithemba Kuluntu</div>
+              <div className="text-xs text-slate-500 leading-tight">Partner CRM</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400 hidden sm:block">Welkom, <span className="text-white font-medium">{gebruiker}</span></span>
+            <span className="text-sm text-slate-500 hidden sm:block">Welkom, <span className="text-slate-800 font-medium">{gebruiker}</span></span>
             <button
               onClick={handleUitloggen}
-              className="bg-gray-800 hover:bg-gray-700 transition px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300"
+              className="border border-slate-200 hover:bg-slate-50 transition px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600"
             >
               Uitloggen
             </button>
@@ -117,19 +122,19 @@ export default function DashboardClient({ partners, gebruiker }: { partners: Par
         {/* Paginatitel + acties */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold">Partners & Donateurs</h1>
-            <p className="text-gray-400 text-sm mt-1">{partners.length} contacten in totaal</p>
+            <h1 className="text-2xl font-bold text-slate-900">Partners & Donateurs</h1>
+            <p className="text-slate-500 text-sm mt-1">{partners.length} contacten in totaal</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => exporteerCSV(partners)}
-              className="bg-gray-800 hover:bg-gray-700 transition px-4 py-2 rounded-lg text-sm font-medium text-gray-300 flex items-center gap-2"
+              className="border border-slate-200 bg-white hover:bg-slate-50 transition px-4 py-2 rounded-xl text-sm font-medium text-slate-600 flex items-center gap-2"
             >
               <span>↓</span> Exporteer CSV
             </button>
             <Link
               href="/dashboard/partner/nieuw"
-              className="bg-green-600 hover:bg-green-500 transition px-4 py-2 rounded-lg text-sm font-semibold"
+              className="bg-blue-700 hover:bg-blue-600 transition px-4 py-2 rounded-xl text-sm font-semibold text-white"
             >
               + Nieuwe partner
             </Link>
@@ -139,14 +144,14 @@ export default function DashboardClient({ partners, gebruiker }: { partners: Par
         {/* Statistieken */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Totaal", value: stats.totaal, kleur: "from-gray-800 to-gray-900", tekst: "text-white" },
-            { label: "Partners", value: stats.partner, kleur: "from-blue-900 to-blue-950", tekst: "text-blue-300" },
-            { label: "Donateurs", value: stats.donateur, kleur: "from-amber-900 to-amber-950", tekst: "text-amber-300" },
-            { label: "Partner & Donateur", value: stats.beide, kleur: "from-purple-900 to-purple-950", tekst: "text-purple-300" },
+            { label: "Totaal", value: stats.totaal, kleur: "bg-slate-900", tekst: "text-white", sub: "text-slate-400" },
+            { label: "Partners", value: stats.partner, kleur: "bg-blue-700", tekst: "text-white", sub: "text-blue-200" },
+            { label: "Donateurs", value: stats.donateur, kleur: "bg-white border border-slate-200", tekst: "text-amber-600", sub: "text-slate-500" },
+            { label: "Partner & Donateur", value: stats.beide, kleur: "bg-white border border-slate-200", tekst: "text-purple-600", sub: "text-slate-500" },
           ].map((s) => (
-            <div key={s.label} className={`bg-gradient-to-br ${s.kleur} rounded-2xl p-5 border border-white/5`}>
+            <div key={s.label} className={`${s.kleur} rounded-2xl p-5 shadow-sm`}>
               <div className={`text-3xl font-bold ${s.tekst}`}>{s.value}</div>
-              <div className="text-sm text-gray-400 mt-1">{s.label}</div>
+              <div className={`text-sm mt-1 ${s.sub}`}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -158,12 +163,12 @@ export default function DashboardClient({ partners, gebruiker }: { partners: Par
             placeholder="Zoek op naam, bedrijf of email..."
             value={zoekterm}
             onChange={(e) => setZoekterm(e.target.value)}
-            className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+            className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-600"
+            className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
           >
             <option value="alle">Alle types</option>
             <option value="partner">Partner</option>
@@ -173,57 +178,63 @@ export default function DashboardClient({ partners, gebruiker }: { partners: Par
         </div>
 
         {/* Resultaattekst */}
-        {zoekterm || filterType !== "alle" ? (
-          <p className="text-sm text-gray-500 mb-3">{gefilterd.length} resultaten</p>
+        {(zoekterm || filterType !== "alle") ? (
+          <p className="text-sm text-slate-400 mb-3">{gefilterd.length} resultaten</p>
         ) : null}
 
         {/* Tabel */}
         {gefilterd.length === 0 ? (
-          <div className="text-center text-gray-500 py-24 border border-gray-800 rounded-2xl">
+          <div className="text-center text-slate-400 py-24 bg-white border border-slate-200 rounded-2xl">
             <div className="text-4xl mb-4">📭</div>
             <p>{partners.length === 0 ? "Nog geen partners geregistreerd." : "Geen resultaten gevonden."}</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-gray-800">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-900 text-gray-400 border-b border-gray-800">
-                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("naam")}>
+                <tr className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-slate-900 font-medium" onClick={() => handleSort("naam")}>
                     Naam <SortIcon k="naam" />
                   </th>
-                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("bedrijfsnaam")}>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-slate-900 font-medium" onClick={() => handleSort("bedrijfsnaam")}>
                     Bedrijf <SortIcon k="bedrijfsnaam" />
                   </th>
-                  <th className="text-left px-4 py-3">Email</th>
-                  <th className="text-left px-4 py-3">Telefoon</th>
-                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("type")}>
+                  <th className="text-left px-4 py-3 font-medium">Email</th>
+                  <th className="text-left px-4 py-3 font-medium">Telefoon</th>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-slate-900 font-medium" onClick={() => handleSort("type")}>
                     Type <SortIcon k="type" />
                   </th>
-                  <th className="text-left px-4 py-3 cursor-pointer hover:text-white" onClick={() => handleSort("created_at")}>
+                  <th className="text-left px-4 py-3 font-medium">Status</th>
+                  <th className="text-left px-4 py-3 cursor-pointer hover:text-slate-900 font-medium" onClick={() => handleSort("created_at")}>
                     Datum <SortIcon k="created_at" />
                   </th>
-                  <th className="text-left px-4 py-3">Acties</th>
+                  <th className="text-left px-4 py-3 font-medium">Acties</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800/50">
+              <tbody className="divide-y divide-slate-100">
                 {gefilterd.map((p) => (
-                  <tr key={p.id} className="bg-gray-900 hover:bg-gray-800/60 transition">
-                    <td className="px-4 py-3 font-medium">{p.voornaam} {p.achternaam}</td>
-                    <td className="px-4 py-3 text-gray-300">{p.bedrijfsnaam}</td>
-                    <td className="px-4 py-3 text-gray-400">{p.email}</td>
-                    <td className="px-4 py-3 text-gray-400">{p.telefoon || "—"}</td>
+                  <tr key={p.id} className="hover:bg-slate-50 transition">
+                    <td className="px-4 py-3 font-medium text-slate-900">{p.voornaam} {p.achternaam}</td>
+                    <td className="px-4 py-3 text-slate-600">{p.bedrijfsnaam}</td>
+                    <td className="px-4 py-3 text-slate-500">{p.email}</td>
+                    <td className="px-4 py-3 text-slate-500">{p.telefoon || "—"}</td>
                     <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${typeBadge[p.type] ?? "bg-gray-700 text-gray-300"}`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${typeBadge[p.type] ?? "bg-slate-100 text-slate-600"}`}>
                         {p.type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-400">{new Date(p.created_at).toLocaleDateString("nl-NL")}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge[p.status] ?? "bg-slate-100 text-slate-600"}`}>
+                        {p.status === "partner" ? "gesloten" : p.status ?? "prospect"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">{new Date(p.created_at).toLocaleDateString("nl-NL")}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-3">
-                        <Link href={`/dashboard/partner/${p.id}`} className="text-blue-400 hover:text-blue-300 text-xs font-medium">
+                        <Link href={`/dashboard/partner/${p.id}`} className="text-blue-600 hover:text-blue-800 text-xs font-medium">
                           Bekijk
                         </Link>
-                        <Link href={`/dashboard/partner/${p.id}/bewerken`} className="text-amber-400 hover:text-amber-300 text-xs font-medium">
+                        <Link href={`/dashboard/partner/${p.id}/bewerken`} className="text-slate-500 hover:text-slate-700 text-xs font-medium">
                           Bewerk
                         </Link>
                       </div>

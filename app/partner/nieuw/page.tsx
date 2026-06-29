@@ -15,8 +15,8 @@ const VELD_FOUTEN: Record<string, string> = {
 function Logo() {
   return (
     <div className="mb-8 text-center">
-      <Image src="/logo.png" alt="Ithemba Kuluntu" width={100} height={100} className="mx-auto mb-4" />
-      <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
+      <Image src="/logo.png" alt="Ithemba Kuluntu" width={80} height={80} className="mx-auto mb-4" />
+      <h1 className="text-2xl font-bold text-slate-900">Ithemba Kuluntu</h1>
     </div>
   );
 }
@@ -31,14 +31,14 @@ function Formulier() {
   const geheimeToken = process.env.NEXT_PUBLIC_FORM_TOKEN;
   if (geheimeToken && token !== geheimeToken) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-sm">
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-sm w-full">
           <Logo />
-          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-3">
             <div className="text-5xl">🔒</div>
-            <h2 className="text-xl font-bold">Niet toegankelijk / Access denied</h2>
-            <p className="text-gray-400 text-sm">Neem contact op met Ithemba Kuluntu voor een registratielink.<br/>Please contact Ithemba Kuluntu for a registration link.</p>
-            <p className="text-gray-500 text-xs pt-2">info@ithembakuluntu.org</p>
+            <h2 className="text-xl font-bold text-slate-900">Niet toegankelijk / Access denied</h2>
+            <p className="text-slate-500 text-sm">Neem contact op met Ithemba Kuluntu voor een registratielink.<br/>Please contact Ithemba Kuluntu for a registration link.</p>
+            <p className="text-slate-400 text-xs pt-2">info@ithembakuluntu.org</p>
           </div>
         </div>
       </main>
@@ -90,13 +90,13 @@ function Formulier() {
 
   if (status === "success") {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-sm">
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-sm w-full">
           <Logo />
-          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-3">
             <div className="text-5xl">✅</div>
-            <h2 className="text-2xl font-bold">Bedankt! / Thank you!</h2>
-            <p className="text-gray-400 text-sm">Uw registratie is ontvangen. U ontvangt binnen enkele minuten een bevestigingsmail.<br/><br/>Your registration has been received. You will receive a confirmation email shortly.</p>
+            <h2 className="text-2xl font-bold text-slate-900">Bedankt! / Thank you!</h2>
+            <p className="text-slate-500 text-sm">Uw registratie is ontvangen. U ontvangt binnen enkele minuten een bevestigingsmail.<br/><br/>Your registration has been received. You will receive a confirmation email shortly.</p>
           </div>
         </div>
       </main>
@@ -105,14 +105,14 @@ function Formulier() {
 
   if (status === "dubbel") {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-sm">
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-sm w-full">
           <Logo />
-          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-3">
             <div className="text-5xl">📧</div>
-            <h2 className="text-2xl font-bold">Al geregistreerd / Already registered</h2>
-            <p className="text-gray-400 text-sm">Dit e-mailadres is al geregistreerd. Neem contact op als dit een fout is.<br/><br/>This email address is already registered. Please contact us if this is an error.</p>
-            <p className="text-gray-500 text-xs pt-2">info@ithembakuluntu.org</p>
+            <h2 className="text-2xl font-bold text-slate-900">Al geregistreerd / Already registered</h2>
+            <p className="text-slate-500 text-sm">Dit e-mailadres is al geregistreerd. Neem contact op als dit een fout is.<br/><br/>This email address is already registered. Please contact us if this is an error.</p>
+            <p className="text-slate-400 text-xs pt-2">info@ithembakuluntu.org</p>
           </div>
         </div>
       </main>
@@ -121,13 +121,13 @@ function Formulier() {
 
   if (status === "geblokkeerd") {
     return (
-      <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-sm">
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-sm w-full">
           <Logo />
-          <div className="bg-gray-900 rounded-2xl p-8 space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-3">
             <div className="text-5xl">⏳</div>
-            <h2 className="text-2xl font-bold">Even wachten / Please wait</h2>
-            <p className="text-gray-400 text-sm">U heeft te veel pogingen gedaan. Probeer het over een uur opnieuw.<br/><br/>Too many attempts. Please try again in an hour.</p>
+            <h2 className="text-2xl font-bold text-slate-900">Even wachten / Please wait</h2>
+            <p className="text-slate-500 text-sm">U heeft te veel pogingen gedaan. Probeer het over een uur opnieuw.<br/><br/>Too many attempts. Please try again in an hour.</p>
           </div>
         </div>
       </main>
@@ -135,86 +135,86 @@ function Formulier() {
   }
 
   const inputKlasse = (veld: string) =>
-    `w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 ${
-      veldFouten[veld] ? "ring-2 ring-red-500" : "focus:ring-green-500"
+    `w-full border rounded-xl px-4 py-2.5 text-slate-900 bg-white focus:outline-none focus:ring-2 ${
+      veldFouten[veld] ? "border-red-400 ring-2 ring-red-300" : "border-slate-300 focus:ring-blue-600"
     }`;
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
       <div className="max-w-xl w-full">
         <div className="mb-8 text-center">
-          <Image src="/logo.png" alt="Ithemba Kuluntu" width={100} height={100} className="mx-auto mb-4" />
-          <h1 className="text-3xl font-bold">Ithemba Kuluntu</h1>
-          <p className="text-gray-400 mt-2">Partnerregistratie / Partner Registration</p>
+          <Image src="/logo.png" alt="Ithemba Kuluntu" width={80} height={80} className="mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-slate-900">Ithemba Kuluntu</h1>
+          <p className="text-slate-500 mt-2 text-sm">Partnerregistratie / Partner Registration</p>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-5 bg-gray-900 rounded-2xl p-6 sm:p-8">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Voornaam / First name *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Voornaam / First name *</label>
               <input name="voornaam" className={inputKlasse("voornaam")} />
-              {veldFouten.voornaam && <p className="text-red-400 text-xs mt-1">{veldFouten.voornaam}</p>}
+              {veldFouten.voornaam && <p className="text-red-500 text-xs mt-1">{veldFouten.voornaam}</p>}
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Achternaam / Last name *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Achternaam / Last name *</label>
               <input name="achternaam" className={inputKlasse("achternaam")} />
-              {veldFouten.achternaam && <p className="text-red-400 text-xs mt-1">{veldFouten.achternaam}</p>}
+              {veldFouten.achternaam && <p className="text-red-500 text-xs mt-1">{veldFouten.achternaam}</p>}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Bedrijfsnaam / Company *</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Bedrijfsnaam / Company *</label>
             <input name="bedrijfsnaam" className={inputKlasse("bedrijfsnaam")} />
-            {veldFouten.bedrijfsnaam && <p className="text-red-400 text-xs mt-1">{veldFouten.bedrijfsnaam}</p>}
+            {veldFouten.bedrijfsnaam && <p className="text-red-500 text-xs mt-1">{veldFouten.bedrijfsnaam}</p>}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Functietitel / Job Title</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Functietitel / Job Title</label>
             <input name="functie" className={inputKlasse("functie")} />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">E-mailadres / Email *</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">E-mailadres / Email *</label>
             <input name="email" type="email" className={inputKlasse("email")} />
-            {veldFouten.email && <p className="text-red-400 text-xs mt-1">{veldFouten.email}</p>}
+            {veldFouten.email && <p className="text-red-500 text-xs mt-1">{veldFouten.email}</p>}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Telefoonnummer / Phone</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Telefoonnummer / Phone</label>
             <input name="telefoon" type="tel" className={inputKlasse("telefoon")} />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Website</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Website</label>
             <input name="website" type="url" placeholder="https://" className={inputKlasse("website")} />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Type samenwerking / Partnership Type *</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Type samenwerking / Partnership Type *</label>
             <select name="type" className={inputKlasse("type")}>
               <option value="">Selecteer... / Select...</option>
               <option value="partner">Partner</option>
               <option value="donateur">Donateur / Donor</option>
               <option value="beide">Partner & Donateur / Partner & Donor</option>
             </select>
-            {veldFouten.type && <p className="text-red-400 text-xs mt-1">{veldFouten.type}</p>}
+            {veldFouten.type && <p className="text-red-500 text-xs mt-1">{veldFouten.type}</p>}
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Opmerkingen / Notes</label>
-            <textarea name="opmerkingen" rows={3} className="w-full bg-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Opmerkingen / Notes</label>
+            <textarea name="opmerkingen" rows={3} className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none" />
           </div>
 
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 transition rounded-xl py-3 font-semibold text-white"
+            className="w-full bg-blue-700 hover:bg-blue-600 disabled:opacity-50 transition rounded-xl py-3 font-semibold text-white"
           >
             {status === "loading" ? "Bezig... / Sending..." : "Registratie indienen / Submit Registration"}
           </button>
 
           {status === "error" && (
-            <p className="text-red-400 text-sm text-center">{foutmelding}</p>
+            <p className="text-red-500 text-sm text-center">{foutmelding}</p>
           )}
         </form>
       </div>
